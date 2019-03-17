@@ -56,9 +56,15 @@ rm(list=ls())
 
 ################### user input ###################
 
-timetype <- "monthly" # "monthly" or "daily"
-from <- 193101 # YYYYMM if timetype = "monthly"
-to <- 201902 # YYYYMMDD if timetype = "daily"
+if (F) {
+    timetype <- "monthly" # "monthly" or "daily"
+    from <- 193101 # YYYYMM if timetype = "monthly"
+    to <- 201902 # YYYYMMDD if timetype = "daily"
+} else if (T) {
+    timetype <- "daily" # "monthly" or "daily"
+    from <- 19310101 # YYYYMM if timetype = "monthly"
+    to <- 20190316 # YYYYMMDD if timetype = "daily"
+}
 regniepath <- getwd()
 inpath <- paste0(regniepath, "/data/", timetype, "/ascii/")
 outpath <- paste0(regniepath, "/post/")
@@ -79,7 +85,11 @@ if (file.access(paste0(outpath, outname_nc), mode=0) == 0 &&
 }
 
 # get ascii files
-cmd <- paste0("ls ", inpath, "*rasa*")
+if (timetype == "monthly") {
+    cmd <- paste0("ls ", inpath, "*rasa*")
+} else if (timetype == "daily") {
+    cmd <- paste0("ls ", inpath, "*ra*")
+}
 message(cmd, " ...")
 fs <- basename(system(cmd, intern=T)) # rasa (ras 'a'bsolute)
 
@@ -170,7 +180,18 @@ for (fi in 1:nf) {
         }
         timevec[fi] <- paste0(timevec[fi], sprintf("%.2i", mm))
     } else if (timetype == "daily") {
-        stop("asd")
+        tmp <- gsub("ra", "", fs[fi])
+        if (nchar(tmp) != 6) stop("unknown file format")
+        yy <- as.numeric(substr(tmp, 1, 2))
+        mm <- as.numeric(substr(tmp, 3, 4))
+        dd <- as.numeric(substr(tmp, 5, 6))
+        # ra000101
+        if (yy >= 31) { # 20th century
+            timevec[fi] <- 1900 + yy
+        } else {
+            timevec[fi] <- 2000 + yy
+        }
+        timevec[fi] <- paste0(timevec[fi], sprintf("%.2i", mm), sprintf("%.2i", dd))
     }
     message(fi, "/", nf, ": ", fs[fi], " --> ", timevec[fi])
 
