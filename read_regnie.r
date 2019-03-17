@@ -56,16 +56,12 @@ rm(list=ls())
 
 ################### user input ###################
 
-timetype <- "monthly" # "monthly" or "daily"
+timetype <- "daily" # "monthly" or "daily"
 from <- 193101 # YYYYMM if timetype = "monthly"
 to <- 201902 # YYYYMMDD if timetype = "daily"
-if (Sys.info()[4] == "K") {
-    inpath <- "~/data/dwd/Regnie/data/ascii/"
-    outpath <- "~/data/dwd/Regnie/post/"
-} else if (substr(Sys.info()[4], 1, 9) == "mistralpp") {
-    inpath <- "/work/ba0941/a270073/data/dwd/Regnie/data/ascii/"
-    outpath <- "/work/ba0941/a270073/data/dwd/Regnie/post/"
-}
+regniepath <- getwd()
+inpath <- paste0(regniepath, "/data/", timetype, "/ascii/")
+outpath <- paste0(regniepath, "/post/")
 outname_nc <- paste0("regnie_", timetype, "_", from, "-", to, ".nc")
 outname_fst <- paste0("regnie_", timetype, "_", from, "-", to, ".fst")
 
