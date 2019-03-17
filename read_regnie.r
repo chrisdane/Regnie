@@ -59,8 +59,9 @@ rm(list=ls())
 timetype <- "monthly" # "monthly" or "daily"
 from <- 193101 # YYYYMM if timetype = "monthly"
 to <- 201902 # YYYYMMDD if timetype = "daily"
-pathin <- paste0("~/data/dwd/regnie/data/", timetype, "/ascii/")
-pathout <- "~/data/dwd/regnie/post/"
+homepath <- getwd() # change here
+inpath <- paste0(homepath, "/data/", timetype, "/ascii/")
+outpath <- paste0(homepath, "/post/")
 outname_nc <- paste0("regnie_", timetype, "_", from, "-", to, ".nc")
 outname_fst <- paste0("regnie_", timetype, "_", from, "-", to, ".fst")
 
@@ -70,15 +71,15 @@ outname_fst <- paste0("regnie_", timetype, "_", from, "-", to, ".fst")
 if (timetype == "daily" && Sys.info()[4] == "K") stop("no.")
 
 # check if binaries already exist
-if (file.access(paste0(pathout, outname_nc), mode=0) == 0 &&
-    file.access(paste0(pathout, outname_fst), mode=0) == 0) {
+if (file.access(paste0(outpath, outname_nc), mode=0) == 0 &&
+    file.access(paste0(outpath, outname_fst), mode=0) == 0) {
     message("files")
-    message(paste0(pathout, c(outname_nc, outname_fst), collapse="\n"))
+    message(paste0(outpath, c(outname_nc, outname_fst), collapse="\n"))
     stop("exist. nothing to do.", call.=F)
 }
 
 # get ascii files
-cmd <- paste0("ls ", pathin, "*rasa*")
+cmd <- paste0("ls ", inpath, "*rasa*")
 message(cmd, " ...")
 fs <- basename(system(cmd, intern=T)) # rasa (ras 'a'bsolute)
 
@@ -87,7 +88,7 @@ if (timetype == "monthly") {
     fs <- fs[-which(substr(fs, 7, 8) == "13")] 
 }
 nf <- length(fs)
-if (nf == 0) stop(paste0("no data found in ", pathin))
+if (nf == 0) stop(paste0("no data found in ", inpath))
 
 # load packages
 library(stringi)
@@ -172,7 +173,7 @@ for (fi in 1:nf) {
     message(fi, "/", nf, ": ", fs[fi], " --> ", timevec[fi])
 
     # data
-    ascii_lines <- readLines(paste0(pathin, fs[fi]))
+    ascii_lines <- readLines(paste0(inpath, fs[fi]))
     mat <- array(NA, c(nlon, nlat)) 
     for (i in 1:nlat) {
         # split long string every 'ninteger'
@@ -230,13 +231,13 @@ if (timetype == "daily") {
 # bezug (07:30-07:30 GZ) erstellt.
 
 # netcdf output
-if (file.access(paste0(pathout, outname_nc), mode=0) == -1) {
+if (file.access(paste0(outpath, outname_nc), mode=0) == -1) {
     if (any(precision == c("double", "float"))) {
         nc_mv <- NA
     } else {
         nc_mv <- ascii_mv
     }
-    message("save ", pathout, outname_nc, " ...")
+    message("save ", outpath, outname_nc, " ...")
     time_dim <- ncdim_def("time", "", time)
     lon_dim <- ncdim_def("longitude", "", lon)
     lat_dim <- ncdim_def("latitude", "", lat)
@@ -244,7 +245,7 @@ if (file.access(paste0(pathout, outname_nc), mode=0) == -1) {
                           list(lon_dim, lat_dim, time_dim),
                           missval=nc_mv, prec=precision)
     timevec_var <- ncvar_def("timevec", "#", time_dim, prec="integer")
-    outnc <- nc_create(paste0(pathout, outname_nc), 
+    outnc <- nc_create(paste0(outpath, outname_nc), 
                        list(data_var, timevec_var), force_v4=T)
     ncvar_put(outnc, data_var, data_all)
     ncvar_put(outnc, timevec_var, timevec)
@@ -254,17 +255,17 @@ if (file.access(paste0(pathout, outname_nc), mode=0) == -1) {
 }
 
 # fst output
-if (file.access(paste0(pathout, outname_fst), mode=0) == -1) {
+if (file.access(paste0(outpath, outname_fst), mode=0) == -1) {
     # fst saves 2-dimensional data frames
     data_all_df <- array(data_all, dim=c(nlon*nlat, nf))
     data_all_df <- as.data.frame(data_all_df)
-    write_fst(data_all_df, paste0(pathout, outname_fst))
+    write_fst(data_all_df, paste0(outpath, outname_fst))
     time_df <- data.frame(time=time, timevec=timevec)
-    write_fst(time_df, paste0(pathout, outname_fst, ".time"))
+    write_fst(time_df, paste0(outpath, outname_fst, ".time"))
     lon_df <- data.frame(lon=lon)
-    write_fst(lon_df, paste0(pathout, outname_fst, ".lon"))
+    write_fst(lon_df, paste0(outpath, outname_fst, ".lon"))
     lat_df <- data.frame(lat=lat)
-    write_fst(lat_df, paste0(pathout, outname_fst, ".lat"))
+    write_fst(lat_df, paste0(outpath, outname_fst, ".lat"))
 }
 
 message("finish")
