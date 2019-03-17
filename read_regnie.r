@@ -91,6 +91,7 @@ nf <- length(fs)
 if (nf == 0) stop(paste0("no data found in ", inpath))
 
 # load packages
+library(ff)
 library(stringi)
 library(ncdf4)
 library(fst)
@@ -149,7 +150,8 @@ if (any(diff(lat) < 0)) {
 precision <- "integer"
 ninteger <- 4 # --> so for this data format, the maximum monthly precip = 9999 mm?!??!?!
 ascii_mv <- -999
-data_all <- array(NA, c(nlon, nlat, nf)) # i like dimension order (lon,lat) more than (lat,lon)
+data_all <- ff(0, vmode="integer", dim=c(nlon, nlat, nf))
+#data_all <- array(NA, c(nlon, nlat, nf)) # i like dimension order (lon,lat) more than (lat,lon)
 timevec <- rep(NA, t=nf)
 
 for (fi in 1:nf) {
