@@ -56,7 +56,7 @@ rm(list=ls())
 
 ################### user input ###################
 
-timetype <- "daily" # "monthly" or "daily"
+timetype <- "monthly" # "monthly" or "daily"
 from <- 193101 # YYYYMM if timetype = "monthly"
 to <- 201902 # YYYYMMDD if timetype = "daily"
 regniepath <- getwd()
