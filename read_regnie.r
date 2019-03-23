@@ -1,6 +1,6 @@
 ## R
 
-## DWD monthly and daily precipitation sum REGNIE (in mm)
+## DWD monthly and daily precipitation sum REGNIE "REgionalisierte NIEderschlagshöhe" (in mm)
 ## ftp://ftp-cdc.dwd.de/pub/CDC/grids_germany/monthly/regnie/
 ## ftp://ftp-cdc.dwd.de/pub/CDC/grids_germany/daily/regnie/
 ## hydromet@dwd.de 
@@ -389,7 +389,7 @@ if (file.access(paste0(outpath, outname_nc), mode=0) == 0 &&
             if (any(data_inds)) {
                 data_tmp[data_inds] <- data_tmp[data_inds] + mat[data_inds]
                 ndata_tmp[data_inds] <- ndata_tmp[data_inds] + 1
-                mm_01_inds <- mat > 0 # mm 
+                mm_01_inds <- mat > 0 # mm = '>= 0.1' since 0.1 is the smallest possible values 
                 if (any(is.na(mm_01_inds))) {
                     mm_01_inds[is.na(mm_01_inds)] <- F
                 }
