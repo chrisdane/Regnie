@@ -477,6 +477,34 @@ if (file.access(paste0(outpath, outname_nc), mode=0) == 0 &&
 
     # fst output
     if (save_as != "annual_mean") {
+
+        f <- "/work/ba0941/a270073/data/dwd/Regnie/post/regnie_daily_19301231-20190316_annual_mean.nc"
+        nc <- nc_open(f)
+        years <- ncvar_get(nc, "year")
+        ndays <- ncvar_get(nc, "sum")
+        ndays_df <- array(ndays, c(prod(dim(ndays)[1:2]), dim(ndays)[3]))
+        ndays_df <- as.data.frame(ndays_df)
+        colnames(ndays_df) <- years
+        write_fst(ndays_df, "post/regnie_daily_19301231-20190316_annual_sum_compress100.fst", compress=100)
+        ndays <- ncvar_get(nc, "ndays_mm_01")
+        ndays_df <- array(ndays, c(prod(dim(ndays)[1:2]), dim(ndays)[3]))
+        ndays_df <- as.data.frame(ndays_df)
+        colnames(ndays_df) <- years
+        write_fst(ndays_df, "post/regnie_daily_19301231-20190316_annual_ndays_mm_01_compress100.fst", compress=100)
+        ndays <- ncvar_get(nc, "ndata")
+        ndays_df <- array(ndays, c(prod(dim(ndays)[1:2]), dim(ndays)[3]))
+        ndays_df <- as.data.frame(ndays_df)
+        colnames(ndays_df) <- years
+        write_fst(ndays_df, "post/regnie_daily_19301231-20190316_annual_ndata_compress100.fst", compress=100)
+        lon <- ncvar_get(nc, "longitude")
+        lat <- ncvar_get(nc, "latitude")
+        lmax <- max(length(lon), length(lat), length(years))
+        lon2 <- c(lon, rep(NA, t=lmax-length(lon)))
+        lat2 <- c(lat, rep(NA, t=lmax-length(lat)))
+        years2 <- c(years, rep(NA, t=lmax-length(years)))
+        df < data.frame(lon=lon2, lat=lat2, years=years2)
+        write_fst(ndays_df, "post/regnie_daily_19301231-20190316_coords_time_compress100.fst", compress=100)
+
         if (file.access(paste0(outpath, outname_fst), mode=0) == -1) {
             # fst saves 2-dimensional data frames
             if (save_as == "array") {
