@@ -341,7 +341,7 @@ if (file.access(paste0(outpath, outname_nc), mode=0) == 0 &&
             if (any(data_inds)) {
                 data_tmp[data_inds] <- data_tmp[data_inds] + mat[data_inds]
                 ndata_tmp[data_inds] <- ndata_tmp[data_inds] + 1
-                mm_01_inds <- mat > 0 # mm 
+                mm_01_inds <- mat > 0 # mm = '>= 0.1' since 0.1 is the smallest possible values 
                 if (any(is.na(mm_01_inds))) {
                     mm_01_inds[is.na(mm_01_inds)] <- F
                 }
